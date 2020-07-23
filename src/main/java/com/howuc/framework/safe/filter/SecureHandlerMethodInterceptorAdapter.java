@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
-public class SafeHandlerMethodInterceptorAdapter extends HandlerInterceptorAdapter {
+public class SecureHandlerMethodInterceptorAdapter extends HandlerInterceptorAdapter {
     private static final List<AbstractHandlerMethodInterceptor> HANDLER_METHOD_INTERCEPTORS = Lists.newArrayList(
             new AuthenticationHandlerMethodInterceptor(),
             new PermissionHandlerMethodInterceptor(),
@@ -19,7 +19,7 @@ public class SafeHandlerMethodInterceptorAdapter extends HandlerInterceptorAdapt
     );
     private boolean hideNotExposedHandler;
 
-    public SafeHandlerMethodInterceptorAdapter(boolean hideNotExposedHandler) {
+    public SecureHandlerMethodInterceptorAdapter(boolean hideNotExposedHandler) {
         this.hideNotExposedHandler = hideNotExposedHandler;
     }
 

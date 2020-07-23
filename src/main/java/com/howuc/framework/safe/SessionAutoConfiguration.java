@@ -1,7 +1,7 @@
 package com.howuc.framework.safe;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.howuc.framework.safe.filter.SafeHandlerMethodInterceptorAdapter;
+import com.howuc.framework.safe.filter.SecureHandlerMethodInterceptorAdapter;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -47,7 +47,7 @@ public class SessionAutoConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new SafeHandlerMethodInterceptorAdapter(safeProperties.isHideNotExposedHandler())).addPathPatterns("/*");
+        registry.addInterceptor(new SecureHandlerMethodInterceptorAdapter(safeProperties.isHideNotExposedHandler())).addPathPatterns("/*");
     }
 
     @Bean
