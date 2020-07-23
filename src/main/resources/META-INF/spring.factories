@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.howuc.framework.safe.SessionAutoConfiguration
+com.howuc.framework.secure.SessionAutoConfiguration
