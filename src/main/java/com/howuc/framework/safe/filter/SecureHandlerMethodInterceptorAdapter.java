@@ -2,11 +2,13 @@ package com.howuc.framework.safe.filter;
 
 import com.google.common.collect.Lists;
 import com.howuc.framework.safe.filter.exception.NotExposedException;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Collection;
 import java.util.List;
 
 public class SecureHandlerMethodInterceptorAdapter extends HandlerInterceptorAdapter {
@@ -19,8 +21,11 @@ public class SecureHandlerMethodInterceptorAdapter extends HandlerInterceptorAda
     );
     private boolean hideNotExposedHandler;
 
-    public SecureHandlerMethodInterceptorAdapter(boolean hideNotExposedHandler) {
+    public SecureHandlerMethodInterceptorAdapter(boolean hideNotExposedHandler, Collection<AbstractHandlerMethodInterceptor> customizedHandlerMethodInterceptor) {
         this.hideNotExposedHandler = hideNotExposedHandler;
+        if (CollectionUtils.isNotEmpty(customizedHandlerMethodInterceptor)) {
+            HANDLER_METHOD_INTERCEPTORS.addAll(customizedHandlerMethodInterceptor);
+        }
     }
 
 

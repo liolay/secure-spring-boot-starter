@@ -1,12 +1,11 @@
 package com.howuc.framework.safe;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.howuc.framework.safe.filter.AbstractHandlerMethodInterceptor;
 import com.howuc.framework.safe.filter.SecureHandlerMethodInterceptorAdapter;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -16,17 +15,21 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Collection;
+
 @RefreshScope
 @Configuration
 @ConditionalOnWebApplication
-@AutoConfigureAfter(RedisAutoConfiguration.class)
+//@AutoConfigureAfter(RedisAutoConfiguration.class)
 @EnableConfigurationProperties({SafeProperties.class})
 public class SessionAutoConfiguration implements WebMvcConfigurer {
     private final SafeProperties safeProperties;
+    private final ObjectProvider<Collection<AbstractHandlerMethodInterceptor>> customizedHandlerMethodInterceptors;
 
     public SessionAutoConfiguration(SafeProperties safeProperties,
                                     StringRedisTemplate redisTemplate,
                                     ObjectProvider<AuthorizingService> authorizingServiceProvider,
+                                    ObjectProvider<Collection<AbstractHandlerMethodInterceptor>> customizedHandlerMethodInterceptors,
                                     ObjectMapper objectMapper) {
         SessionManager.redisTemplate = redisTemplate;
         SessionManager.safeProperties = safeProperties;
@@ -36,6 +39,7 @@ public class SessionAutoConfiguration implements WebMvcConfigurer {
         AccessToken.safeProperties = safeProperties;
         AccessToken.objectMapper = objectMapper;
         this.safeProperties = safeProperties;
+        this.customizedHandlerMethodInterceptors = customizedHandlerMethodInterceptors;
     }
 
     @Bean
@@ -47,7 +51,12 @@ public class SessionAutoConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new SecureHandlerMethodInterceptorAdapter(safeProperties.isHideNotExposedHandler())).addPathPatterns("/*");
+        registry.addInterceptor(
+                new SecureHandlerMethodInterceptorAdapter(
+                        safeProperties.isHideNotExposedHandler(),
+                        customizedHandlerMethodInterceptors.getIfAvailable()
+                )
+        ).addPathPatterns("/**");
     }
 
     @Bean
